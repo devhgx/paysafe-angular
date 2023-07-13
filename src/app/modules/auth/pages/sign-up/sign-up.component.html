@@ -23,7 +23,7 @@
       </div>
       <div *ngIf="submitted && f['fname'].errors" class="is__invalid-error">
         <div *ngIf="f['fname'].errors['required']">Required field</div>
-        <div *ngIf="f['fname'].errors['minlength']">User Name must least 6 characters</div>
+        <div *ngIf="f['fname'].errors['minlength']">First Name must least 6 characters</div>
       </div>
     </div>
     <div class="form__group">
@@ -43,9 +43,32 @@
       </div>
       <div *ngIf="submitted && f['lname'].errors" class="is__invalid-error">
         <div *ngIf="f['lname'].errors['required']">Required field</div>
-        <div *ngIf="f['lname'].errors['minlength']">User Name must least 6 characters</div>
+        <div *ngIf="f['lname'].errors['minlength']">Last Name must least 6 characters</div>
       </div>
     </div>
+    <div class="form__group">
+      <div class="relative">
+        <input
+          type="text"
+          id="email"
+          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+          class="peer block"
+          placeholder=" "
+          [ngClass]="{ 'is__invalid-input': submitted && f['email'].errors }"
+          formControlName="email" />
+        <label
+          for="lname"
+          class="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-500 dark:bg-night-700 dark:text-night-200">
+          Email
+        </label>
+      </div>
+      <div *ngIf="submitted && f['email'].errors" class="is__invalid-error">
+        <div *ngIf="f['email'].errors['required']">Required field</div>
+        <div *ngIf="f['email'].errors['email']">Required Email paatern</div>
+        <div *ngIf="f['email'].errors['minlength']">Email must least 6 characters</div>
+      </div>
+    </div>
+
     <div class="form__group">
       <div class="relative">
         <input
@@ -91,7 +114,7 @@
       </div>
       <div *ngIf="submitted && f['password'].errors" class="is__invalid-error">
         <div *ngIf="f['password'].errors['required']">Required field</div>
-        <div *ngIf="f['password'].errors['minlength']">User Name must least 6 characters</div>
+        <div *ngIf="f['password'].errors['minlength']">Password must least 6 characters</div>
       </div>
     </div>
     <!-- Password Meeter -->
@@ -127,9 +150,10 @@
           </svg-icon>
         </span>
       </div>
+      <div  *ngIf="submitted && passwordMatchValidate" class="is__invalid-error">Password miss match</div>
       <div *ngIf="submitted && f['confirmPassword'].errors" class="is__invalid-error">
         <div *ngIf="f['confirmPassword'].errors['required']">Required field</div>
-        <div *ngIf="f['confirmPassword'].errors['minlength']">User Name must least 6 characters</div>
+        <div *ngIf="f['confirmPassword'].errors['minlength']">Confirm Password must least 6 characters</div>
       </div>
     </div>
     <div class="form__group">
@@ -149,7 +173,7 @@
       </div>
       <div *ngIf="submitted && f['phone'].errors" class="is__invalid-error">
         <div *ngIf="f['phone'].errors['required']">Required field</div>
-        <div *ngIf="f['phone'].errors['minlength']">User Name must least 6 characters</div>
+        <div *ngIf="f['phone'].errors['minlength']">Phone Number must least 10 characters</div>
       </div>
     </div>
     <div class="form__group">
@@ -175,7 +199,6 @@
       </div>
       <div *ngIf="submitted && f['bankId'].errors" class="is__invalid-error">
         <div *ngIf="f['bankId'].errors['required']">Required field</div>
-        <div *ngIf="f['bankId'].errors['minlength']">User Name must least 6 characters</div>
       </div>
     </div>
     <div class="form__group">
@@ -195,7 +218,7 @@
       </div>
       <div *ngIf="submitted && f['bankAccountName'].errors" class="is__invalid-error">
         <div *ngIf="f['bankAccountName'].errors['required']">Required field</div>
-        <div *ngIf="f['bankAccountName'].errors['minlength']">User Name must least 6 characters</div>
+        <div *ngIf="f['bankAccountName'].errors['minlength']">User Name must least 3 characters</div>
       </div>
     </div>
     <div class="form__group">
@@ -216,30 +239,28 @@
     </div>
     <div *ngIf="submitted && f['bankAccountNumber'].errors" class="is__invalid-error">
       <div *ngIf="f['bankAccountNumber'].errors['required']">Required field</div>
-      <div *ngIf="f['bankAccountNumber'].errors['minlength']">User Name must least 6 characters</div>
+      <div *ngIf="f['bankAccountNumber'].errors['minlength']">Bank Account Number must least 6 characters</div>
     </div>
   </div>
 
   <div class="flex items-center justify-between space-x-3">
     <div class="form__group">
-    <div class="flex items-center">
-      <input
-        id="acceptTerm"
-        name="acceptTerm"
-        type="checkbox"
-        [ngClass]="{ 'is__invalid-input': submitted && f['acceptTerm'].errors }"
-        formControlName="acceptTerm" />
-      <label for="acceptTerm" class="ml-2 block text-sm text-gray-400 dark:text-night-200">
-        I Accept the
-        <a class="font-medium text-primary-500 hover:text-primary-400"> Terms </a>
-      </label>
+      <div class="flex items-center">
+        <input
+          id="acceptTerm"
+          name="acceptTerm"
+          type="checkbox"
+          [ngClass]="{ 'is__invalid-input': submitted && f['acceptTerm'].errors }"
+          formControlName="acceptTerm" />
+        <label for="acceptTerm" class="ml-2 block text-sm text-gray-400 dark:text-night-200">
+          I Accept the
+          <a class="font-medium text-primary-500 hover:text-primary-400"> Terms </a>
+        </label>
+      </div>
+      <div *ngIf="submitted && f['acceptTerm'].errors" class="is__invalid-error">
+        <div *ngIf="f['acceptTerm'].errors['required']">Required field</div>
+      </div>
     </div>
-    <div *ngIf="submitted && f['acceptTerm'].errors" class="is__invalid-error">
-      <div *ngIf="f['acceptTerm'].errors['required']">Required field</div>
-      <div *ngIf="f['acceptTerm'].errors['minlength']">User Name must least 6 characters</div>
-    </div>
-  </div>
-
   </div>
 
   <!-- Submit Button   routerLink="/dashboard" -->
@@ -253,3 +274,4 @@
     Already have an Account? <a routerLink="/auth/sign-in" class="text-primary-500 hover:text-primary-400">Sign in</a>
   </div>
 </form>
+<app-modal [modalData]="modalData" ></app-modal>

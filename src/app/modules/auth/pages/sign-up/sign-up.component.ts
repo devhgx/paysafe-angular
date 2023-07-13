@@ -27,6 +27,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
   passwordTextType!: boolean;
   passwordConfirmTextType!: boolean;
   _subscription: any;
+  passwordMatchValidate:boolean = false;
   constructor(
     private readonly _formBuilder: FormBuilder,
     private readonly _router: Router,
@@ -41,11 +42,12 @@ export class SignUpComponent implements OnInit, OnDestroy {
       username: ['', [Validators.required, Validators.minLength(6)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
-      phone: ['', [Validators.required, Validators.minLength(6)]],
+      phone: ['', [Validators.required, Validators.minLength(10)]],
       bankId: ['', [Validators.required]],
-      bankAccountName: ['', [Validators.required], Validators.minLength(6)],
+      bankAccountName: ['', [Validators.required], Validators.minLength(3)],
       bankAccountNumber: ['', [Validators.required, Validators.minLength(6)]],
-      acceptTerm: ['', [Validators.required, Validators.minLength(6)]],
+      acceptTerm: ['', [Validators.required ]],
+      email: ['', [Validators.required, Validators.minLength(6), Validators.email]],
     });
   }
 
@@ -63,23 +65,69 @@ export class SignUpComponent implements OnInit, OnDestroy {
   onSubmit() {
     this.modalData.status = false;
     this.submitted = true;
-    const { fname, lname, username, confirmPassword, phone, bankId, bankAccountName, bankAccountNumber, acceptTerm } =
-      this.form.value;
+    const {
+      fname,
+      lname,
+      username,
+      confirmPassword,
+      email,
+      password,
+      phone,
+      bankId,
+      bankAccountName,
+      bankAccountNumber,
+      acceptTerm,
+    } = this.form.value;
     // stop here if form is invalid
-    console.log(this.form.controls)
+    this.passwordMatchValidate = false;
+    if (password !== confirmPassword){
+      this.passwordMatchValidate = true
+ }
     if (this.form.invalid) {
       return;
-    } else {
+    } else{
       this._subscription = this._userService
-        .register({ fname, lname, username, confirmPassword, phone, bankId, bankAccountName, bankAccountNumber, acceptTerm })
+
+        .register({
+          firstName: fname,
+          lastName: lname,
+          username: username,
+          email: email,
+          phoneNumber: phone,
+          password: password,
+          bankId: bankId,
+          accountBankName: bankAccountName,
+          accountBankNumber: bankAccountNumber,
+          acceptTerm,
+        })
         .pipe(
           tap((response: any) => {
             if (response.status === 200) {
+              this.form.reset();
+              console.log(response);
+              this.modalData = {
+                title: 'Success',
+                description: 'You register ready!!',
+                buttonOk: true,
+                buttonClose: false,
+                buttonOkName: 'OK',
+                buttonCloseName: 'Close',
+                status: true,
+              };
+              this._router.navigate(['/auth/sign-in'])
             }
           }),
           catchError((error: any) => {
             console.log(error);
-            this.modalData.status = true;
+            this.modalData = {
+              title: 'Warning',
+              description: error.error.data.join('</br>'),
+              buttonOk: true,
+              buttonClose: false,
+              buttonOkName: 'OK',
+              buttonCloseName: 'Close',
+              status: true,
+            };
             return of(error).pipe(tap(console.error));
           }),
         )
