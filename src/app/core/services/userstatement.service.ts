@@ -11,13 +11,17 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root',
 })
-export class TransactionService {
-  readonly _apiUrl = environment.apiUrl + 'transaction';
+export class UserStatementService {
+  readonly _apiUrl = environment.apiUrl + 'user-statements';
 
   constructor(private _http: HttpClient, private _storageService: StorageService, private _jwtService: JwtService) {}
 
-  list(pageNumber: number, pageSize: number): Observable<any> {
-    const url: string = this._apiUrl + `/list/${pageNumber}/${pageSize}`;
+  listActive(): Observable<any> {
+    const url: string = this._apiUrl + `/listActive`;
+    return this._http.get(url, httpOptions);
+  }
+  listAll(pageNumber: number, pageSize: number): Observable<any> {
+    const url: string = this._apiUrl + `/listAll/${pageNumber}/${pageSize}`;
     return this._http.get(url, httpOptions);
   }
 }

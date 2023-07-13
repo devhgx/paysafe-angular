@@ -76,6 +76,9 @@ export class SignInComponent implements OnInit, OnDestroy {
     }
   }
   ngOnDestroy() {
-    this._subscription.unsubscribe();
+    if (this._subscription){
+      this._subscription.unsubscribe();
+    }
+
   }
 }

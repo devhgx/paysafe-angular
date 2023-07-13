@@ -4,7 +4,6 @@ import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 import { StorageService } from './storage.service';
 import { JwtService } from './jwt.service';
-import { JwtPayload } from 'jwt-decode';
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
 };
@@ -23,20 +22,12 @@ export class AuthService {
 
     return this._http
       .post(url, body, httpOptions)
-      // .pipe(catchError((error) => {
-      //   console.error(error);
-      //  throw error;
-      // }));
   }
   refreshToken(refreshToken:string): Observable<any>{
     const url: string = this._apiUrl + '/refreshToken';
     const body = { refreshToken };
     return this._http
     .post(url, body, httpOptions)
-    // .pipe(catchError((error) => {
-    //   console.error(error);
-    //  throw error;
-    // }));
   }
   isAccessTokenExpired() {
     console.log('isAccessTokenExpired')
@@ -50,5 +41,12 @@ export class AuthService {
     const currentTimestamp = new Date().getTime();
 
     return jwt && jwt.exp && jwt.exp * 1000 < currentTimestamp;
+  }
+  logout(data:any): Observable<any> {
+    const url: string = this._apiUrl + '/logout';
+    const body = data;
+
+    return this._http
+      .post(url, body, httpOptions)
   }
 }
