@@ -1,4 +1,5 @@
 <!-- login form -->
+<app-toast  [iconStatus]="_toastService.iconToastStatus" [title]="_toastService.toastTitle" [showToastSuccess]="_toastService.showToastSuccess"></app-toast>
 <form class="my-10 space-y-6" [formGroup]="form" (ngSubmit)="onSubmit()">
 
   <div class="space-y-3 text-left">
@@ -63,4 +64,3 @@
     Not a Member yet? <a routerLink="/auth/sign-up" class="text-primary-500 hover:text-primary-400">Register</a>
   </div>
 </form>
-<app-modal [modalData]="modalData" ></app-modal>

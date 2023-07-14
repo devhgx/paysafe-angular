@@ -5,51 +5,32 @@ import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { TransferService } from 'src/app/core/services/transfer.service';
 import { ModalModel } from 'src/app/core/models/modal.model';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-approve',
   templateUrl: './approve.component.html',
 })
 export class ApproveComponent implements OnInit, OnDestroy {
-  modalData: ModalModel = {
-    title: 'Cannot access to PaySafe',
-    description: 'invalid username or password.',
-    buttonOk: true,
-    buttonClose: false,
-    buttonOkName: 'OK',
-    buttonCloseName: 'Close',
-    status: false,
-  };
-  showToastSuccess = false;
+
   listSub: any = null;
   approveSub: any = null;
   listTransaction: any = [];
-  constructor(private _transactionService: TransactionService, private _transferService: TransferService) {
+  constructor(private _transactionService: TransactionService, private _transferService: TransferService, public _toastService: ToastService) {
 
   }
-  closeToast(){
-    this.showToastSuccess = false;
-  }
+
   approveRoot(transactionId: number) {
-      this.showToastSuccess = true;
+
       this.approveSub =this._transferService.approve({transactionId: transactionId}).pipe(
         tap((response: any) => {
           if (response.status === 200) {
-            this.showToastSuccess = true;
+            this._toastService.toastSuccess("Approve Success")
             this.listLoad();
           }
         }),
         catchError((error: any) => {
-          console.log(error);
-          this.modalData = {
-            title: 'Warning',
-            description: error.error.data.join('</br>'),
-            buttonOk: true,
-            buttonClose: false,
-            buttonOkName: 'OK',
-            buttonCloseName: 'Close',
-            status: true,
-          };
+          this._toastService.toastError( error.error.data.join('</br>'))
           return of(error).pipe(tap(console.error));
         }),
       )
@@ -78,7 +59,6 @@ export class ApproveComponent implements OnInit, OnDestroy {
     .subscribe();
   }
   ngOnInit(): void {
-    this.showToastSuccess = false;
     this.listLoad();
   }
 }

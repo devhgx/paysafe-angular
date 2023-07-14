@@ -4,7 +4,6 @@ import { MenuItem } from 'src/app/core/models/menu.model';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import packageJson from '../../../../../../package.json';
 import { MenuService } from '../../services/menu.service';
-import { UsersService } from 'src/app/core/services/users.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { Router } from '@angular/router';
@@ -47,18 +46,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
   clickSignOut() {
     this._authSub = this._authService
       .logout()
-      .pipe(
-        tap((response: any) => {
-          if (response.status === 200) {
-            this._storageService.clean();
-            this._router.navigate(['/auth/sign-in']);
-          }
-        }),
-        catchError((error: any) => {
+      .pipe(catchError((error: any) => {
           console.log(error);
           return of(error).pipe(tap(console.error));
         }),
       )
       .subscribe();
+      this._storageService.clean();
+      this._router.navigate(['/auth/sign-in']);
   }
 }

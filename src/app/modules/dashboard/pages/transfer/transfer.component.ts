@@ -5,6 +5,7 @@ import { tap, catchError, of } from 'rxjs';
 import { ModalModel } from 'src/app/core/models/modal.model';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { TransferService } from 'src/app/core/services/transfer.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-transfer',
@@ -27,6 +28,7 @@ export class TransferComponent implements OnInit, OnDestroy {
   passwordConfirmTextType!: boolean;
   _subscription: any;
   passwordMatchValidate:boolean = false;
+  showToastSuccess = false;
   userProfile: any = {
 
   }
@@ -35,10 +37,12 @@ export class TransferComponent implements OnInit, OnDestroy {
     // private readonly _router: Router,
     // private _userService: UsersService,
     private _transferService: TransferService,
-    private _storageService: StorageService
+    private _storageService: StorageService,
+    public _toastService: ToastService
   ) {}
 
   ngOnInit(): void {
+    this.showToastSuccess = false;
     this.userProfile = this._storageService.getUserProfile();
     console.log( this.userProfile )
     this.form = this._formBuilder.group({
@@ -54,7 +58,7 @@ export class TransferComponent implements OnInit, OnDestroy {
 
 
   onSubmit() {
-    this.modalData.status = false;
+   this._toastService.toastClose();
     this.submitted = true;
     const {
       note,
@@ -77,28 +81,11 @@ export class TransferComponent implements OnInit, OnDestroy {
             if (response.status === 200) {
               this.form.reset();
               Object.values(this.form.controls).forEach((control) => control.setErrors(null));
-              this.modalData = {
-                title: 'Success',
-                description: 'You transfer ready!!',
-                buttonOk: true,
-                buttonClose: false,
-                buttonOkName: 'OK',
-                buttonCloseName: 'Close',
-                status: true,
-              };
+              this._toastService.toastSuccess("Transfer Success");
             }
           }),
           catchError((error: any) => {
-            console.log(error);
-            this.modalData = {
-              title: 'Warning',
-              description: error.error.data.join('</br>'),
-              buttonOk: true,
-              buttonClose: false,
-              buttonOkName: 'OK',
-              buttonCloseName: 'Close',
-              status: true,
-            };
+            this._toastService.toastError(error.error.data.join('</br>'));
             return of(error).pipe(tap(console.error));
           }),
         )

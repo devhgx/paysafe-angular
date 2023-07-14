@@ -5,35 +5,36 @@ import { tap, catchError } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { of } from 'rxjs';
-import { ModalModel } from 'src/app/core/models/modal.model';
-
+import { ToastService } from 'src/app/core/services/toast.service';
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss'],
 })
-export class SignInComponent implements OnInit, OnDestroy {
-  modalData: ModalModel = {
-    title: 'Cannot access to PaySafe',
-    description: 'invalid username or password.',
-    buttonOk: true,
-    buttonClose: false,
-    buttonOkName: 'OK',
-    buttonCloseName: 'Close',
-    status: false,
-  };
+
+
+
+export class SignInComponent  implements OnInit, OnDestroy {
   form!: FormGroup;
   submitted = false;
   passwordTextType!: boolean;
   _subscription: any;
+  showToastSuccess = false;
+  iconToastStatus = "success"
+  toastTitle = "";
+
   constructor(
     private readonly _formBuilder: FormBuilder,
     private readonly _router: Router,
     private _authService: AuthService,
     private _storageService: StorageService,
-  ) {}
+    public _toastService: ToastService
+  ) {
+
+  }
 
   ngOnInit(): void {
+    this.showToastSuccess = false;
     this.form = this._formBuilder.group({
       username: ['', [Validators.required, Validators.minLength(6)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -47,9 +48,18 @@ export class SignInComponent implements OnInit, OnDestroy {
   togglePasswordTextType() {
     this.passwordTextType = !this.passwordTextType;
   }
-
+  // toastSuccess(message: string){
+  //   this.showToastSuccess = true;
+  //   this.toastTitle = message
+  //   this.iconToastStatus = "success"
+  // }
+  // toastError(message: string){
+  //   this.showToastSuccess = true;
+  //   this.toastTitle = message
+  //   this.iconToastStatus = "danger"
+  // }
   onSubmit() {
-    this.modalData.status = false;
+    this._toastService.toastClose();
     this.submitted = true;
     const { username, password } = this.form.value;
     // stop here if form is invalid
@@ -61,14 +71,13 @@ export class SignInComponent implements OnInit, OnDestroy {
         .pipe(
           tap((response: any) => {
             if (response.status === 200) {
-              this._router.navigate(['/dashboard/main']);
+              this._toastService.toastSuccess("Login success")
               this._storageService.saveUser(response.data);
-            } else {
+              this._router.navigate(['/dashboard/main']);
             }
           }),
           catchError((error: any) => {
-            console.log(error)
-            this.modalData.status = true;
+            this._toastService.toastError(error.error.data.join('</br>'));
             return of(error).pipe(tap(console.error));
           }),
         )

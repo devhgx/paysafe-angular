@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { ModalModel } from 'src/app/core/models/modal.model';
+import { ToastService } from 'src/app/core/services/toast.service';
 import { TransferService } from 'src/app/core/services/transfer.service';
 
 @Component({
@@ -26,12 +27,17 @@ export class DepositComponent implements OnInit, OnDestroy {
   passwordConfirmTextType!: boolean;
   _subscription: any;
   passwordMatchValidate:boolean = false;
+  showToastSuccess = false;
+
+
   constructor(
     private readonly _formBuilder: FormBuilder,
     private _transferService: TransferService,
+    public _toastService: ToastService
   ) {}
 
   ngOnInit(): void {
+    this.showToastSuccess = false;
     this.form = this._formBuilder.group({
       amount: ['', [Validators.required, Validators.min(1)]],
       bankId: ['', [Validators.required]],
@@ -47,7 +53,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
 
   onSubmit() {
-    this.modalData.status = false;
+    this._toastService.toastClose();
     this.submitted = true;
     const {
       amount,
@@ -74,28 +80,11 @@ export class DepositComponent implements OnInit, OnDestroy {
             if (response.status === 200) {
               this.form.reset();
               Object.values(this.form.controls).forEach((control) => control.setErrors(null));
-              this.modalData = {
-                title: 'Success',
-                description: 'You deposit ready!!',
-                buttonOk: true,
-                buttonClose: false,
-                buttonOkName: 'OK',
-                buttonCloseName: 'Close',
-                status: true,
-              };
+              this._toastService.toastSuccess("Deposit Success")
             }
           }),
           catchError((error: any) => {
-            console.log(error);
-            this.modalData = {
-              title: 'Warning',
-              description: error.error.data.join('</br>'),
-              buttonOk: true,
-              buttonClose: false,
-              buttonOkName: 'OK',
-              buttonCloseName: 'Close',
-              status: true,
-            };
+            this._toastService.toastError(error.error.data.join('</br>'));
             return of(error).pipe(tap(console.error));
           }),
         )

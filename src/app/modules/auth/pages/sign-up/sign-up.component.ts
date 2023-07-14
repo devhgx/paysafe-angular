@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ModalModel } from 'src/app/core/models/modal.model';
 import { UsersService } from 'src/app/core/services/users.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -12,25 +12,18 @@ import { UsersService } from 'src/app/core/services/users.service';
   styleUrls: ['./sign-up.component.scss'],
 })
 export class SignUpComponent implements OnInit, OnDestroy {
-  modalData: ModalModel = {
-    title: 'Cannot access to PaySafe',
-    description: 'invalid username or password.',
-    buttonOk: true,
-    buttonClose: false,
-    buttonOkName: 'OK',
-    buttonCloseName: 'Close',
-    status: false,
-  };
   form!: FormGroup;
   submitted = false;
   passwordTextType!: boolean;
   passwordConfirmTextType!: boolean;
   _subscription: any;
-  passwordMatchValidate:boolean = false;
+  passwordMatchValidate: boolean = false;
+
   constructor(
     private readonly _formBuilder: FormBuilder,
     private readonly _router: Router,
     private _userService: UsersService,
+    public _toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +37,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
       bankId: ['', [Validators.required]],
       bankAccountName: ['', [Validators.required], Validators.minLength(3)],
       bankAccountNumber: ['', [Validators.required, Validators.minLength(6)]],
-      acceptTerm: ['', [Validators.required ]],
+      acceptTerm: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.minLength(6), Validators.email]],
     });
   }
@@ -61,7 +54,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    this.modalData.status = false;
+    this._toastService.toastSuccess('Register Success');
+    return;
+    this._toastService.toastClose();
     this.submitted = true;
     const {
       fname,
@@ -78,14 +73,14 @@ export class SignUpComponent implements OnInit, OnDestroy {
     } = this.form.value;
     // stop here if form is invalid
     this.passwordMatchValidate = false;
-    if (password !== confirmPassword){
-      this.passwordMatchValidate = true
- }
+    if (password !== confirmPassword) {
+      this.passwordMatchValidate = true;
+      return;
+    }
     if (this.form.invalid) {
       return;
-    } else{
+    } else {
       this._subscription = this._userService
-
         .register({
           firstName: fname,
           lastName: lname,
@@ -103,29 +98,11 @@ export class SignUpComponent implements OnInit, OnDestroy {
             if (response.status === 200) {
               this.form.reset();
               Object.values(this.form.controls).forEach((control) => control.setErrors(null));
-              this.modalData = {
-                title: 'Success',
-                description: 'You register ready!!',
-                buttonOk: true,
-                buttonClose: false,
-                buttonOkName: 'OK',
-                buttonCloseName: 'Close',
-                status: true,
-              };
-              this._router.navigate(['/auth/sign-in'])
+              //this._router.navigate(['/auth/sign-in']);
             }
           }),
           catchError((error: any) => {
-            console.log(error);
-            this.modalData = {
-              title: 'Warning',
-              description: error.error.data.join('</br>'),
-              buttonOk: true,
-              buttonClose: false,
-              buttonOkName: 'OK',
-              buttonCloseName: 'Close',
-              status: true,
-            };
+            this._toastService.toastError(error.error.data.join('</br>'));
             return of(error).pipe(tap(console.error));
           }),
         )

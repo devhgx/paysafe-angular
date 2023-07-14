@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { ModalModel } from 'src/app/core/models/modal.model';
 import { TransferService } from 'src/app/core/services/transfer.service';
 import { StorageService } from 'src/app/core/services/storage.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-withdraw',
@@ -35,7 +36,8 @@ export class WithdrawComponent implements OnInit, OnDestroy {
     // private readonly _router: Router,
     // private _userService: UsersService,
     private _transferService: TransferService,
-    private _storageService: StorageService
+    private _storageService: StorageService,
+    public _toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -54,7 +56,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
 
   onSubmit() {
-    this.modalData.status = false;
+     this._toastService.toastClose();
     this.submitted = true;
     const {
       note,
@@ -76,29 +78,11 @@ export class WithdrawComponent implements OnInit, OnDestroy {
             if (response.status === 200) {
               this.form.reset();
               Object.values(this.form.controls).forEach((control) => control.setErrors(null));
-              console.log(response);
-              this.modalData = {
-                title: 'Success',
-                description: 'You withdraw ready!!',
-                buttonOk: true,
-                buttonClose: false,
-                buttonOkName: 'OK',
-                buttonCloseName: 'Close',
-                status: true,
-              };
+              this._toastService.toastSuccess("Withdraw Success")
             }
           }),
           catchError((error: any) => {
-            console.log(error);
-            this.modalData = {
-              title: 'Warning',
-              description: error.error.data.join('</br>'),
-              buttonOk: true,
-              buttonClose: false,
-              buttonOkName: 'OK',
-              buttonCloseName: 'Close',
-              status: true,
-            };
+            this._toastService.toastError(error.error.data.join('</br>'));
             return of(error).pipe(tap(console.error));
           }),
         )
