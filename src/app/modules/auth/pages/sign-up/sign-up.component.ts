@@ -54,8 +54,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    this._toastService.toastSuccess('Register Success');
-    return;
     this._toastService.toastClose();
     this.submitted = true;
     const {
