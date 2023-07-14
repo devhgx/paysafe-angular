@@ -1,42 +1,112 @@
-import { Component, OnInit } from '@angular/core';
-import { Nft } from '../../models/nft';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { ModalModel } from 'src/app/core/models/modal.model';
+import { TransferService } from 'src/app/core/services/transfer.service';
 
 @Component({
   selector: 'app-deposit',
   templateUrl: './deposit.component.html',
+  styleUrls: ['./deposit.component.scss'],
 })
-export class DepositComponent implements OnInit {
-  nft: Array<Nft>;
+export class DepositComponent implements OnInit, OnDestroy {
+  modalData: ModalModel = {
+    title: 'Cannot access to PaySafe',
+    description: 'invalid username or password.',
+    buttonOk: true,
+    buttonClose: false,
+    buttonOkName: 'OK',
+    buttonCloseName: 'Close',
+    status: false,
+  };
+  form!: FormGroup;
+  submitted = false;
+  passwordTextType!: boolean;
+  passwordConfirmTextType!: boolean;
+  _subscription: any;
+  passwordMatchValidate:boolean = false;
+  constructor(
+    private readonly _formBuilder: FormBuilder,
+    // private readonly _router: Router,
+    // private _userService: UsersService,
+    private _transferService: TransferService,
+  ) {}
 
-  constructor() {
-    this.nft = [
-      {
-        id: 34356771,
-        title: 'Girls of the Cartoon Universe',
-        creator: 'Jhon Doe',
-        instant_price: 4.2,
-        price: 187.47,
-        ending_in: '06h 52m 47s',
-        last_bid: 0.12,
-        image: './assets/images/img-01.jpg',
-        avatar: './assets/avatars/avt-01.jpg',
-      },
-      {
-        id: 34356772,
-        title: 'Pupaks',
-        price: 548.79,
-        last_bid: 0.35,
-        image: './assets/images/img-02.jpg',
-      },
-      {
-        id: 34356773,
-        title: 'Seeing Green collection',
-        price: 234.88,
-        last_bid: 0.15,
-        image: './assets/images/img-03.jpg',
-      },
-    ];
+  ngOnInit(): void {
+    this.form = this._formBuilder.group({
+      amount: ['', [Validators.required, Validators.min(1)]],
+      bankId: ['', [Validators.required]],
+      bankAccountName: ['', [Validators.required], Validators.minLength(3)],
+      bankAccountNumber: ['', [Validators.required, Validators.minLength(6)]],
+      note: ['', [Validators.required ]],
+    });
   }
 
-  ngOnInit(): void {}
+  get f() {
+    return this.form.controls;
+  }
+
+
+  onSubmit() {
+    this.modalData.status = false;
+    this.submitted = true;
+    const {
+      amount,
+      bankId,
+      bankAccountName,
+      bankAccountNumber,
+      note
+    } = this.form.value;
+
+    if (this.form.invalid) {
+      return;
+    } else{
+      this._subscription = this._transferService
+        .deposit(
+          {
+            "depositFromBankId": bankId,
+            "depositFromAccountBankNumber": bankAccountNumber,
+            "depositFromAccountName": bankAccountName,
+            "note": note,
+            "amount": amount
+          })
+        .pipe(
+          tap((response: any) => {
+            if (response.status === 200) {
+              this.form.reset();
+              console.log(response);
+              this.modalData = {
+                title: 'Success',
+                description: 'You deposit ready!!',
+                buttonOk: true,
+                buttonClose: false,
+                buttonOkName: 'OK',
+                buttonCloseName: 'Close',
+                status: true,
+              };
+            }
+          }),
+          catchError((error: any) => {
+            console.log(error);
+            this.modalData = {
+              title: 'Warning',
+              description: error.error.data.join('</br>'),
+              buttonOk: true,
+              buttonClose: false,
+              buttonOkName: 'OK',
+              buttonCloseName: 'Close',
+              status: true,
+            };
+            return of(error).pipe(tap(console.error));
+          }),
+        )
+        .subscribe();
+    }
+  }
+  ngOnDestroy() {
+    if (this._subscription) {
+      this._subscription.unsubscribe();
+    }
+  }
 }

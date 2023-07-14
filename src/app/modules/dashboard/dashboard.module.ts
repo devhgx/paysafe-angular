@@ -22,6 +22,7 @@ import { ApproveComponent } from './pages/approve/approve.component';
 import { SignOutComponent } from './signout/sign-out.component';
 import { AdminTableComponent } from './pages/approve/components/admin-table/admin-table.component';
 import { AdminTableItemComponent } from './pages/approve/components/admin-table-item/admin-table-item.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { AdminTableItemComponent } from './pages/approve/components/admin-table-
     ApproveComponent,
     SignOutComponent,
     AdminTableComponent,
-    AdminTableItemComponent
+    AdminTableItemComponent,
+
   ],
   imports: [
     CommonModule,
@@ -48,6 +50,8 @@ import { AdminTableItemComponent } from './pages/approve/components/admin-table-
     HttpClientModule,
     NgApexchartsModule,
     AngularSvgIconModule.forRoot(),
+    FormsModule,
+    ReactiveFormsModule,
   ],
 })
 export class DashboardModule {}

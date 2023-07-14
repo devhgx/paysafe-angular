@@ -3,18 +3,31 @@ import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HTTP_INTERCEPTORS
 import { Observable, catchError, switchMap, throwError } from 'rxjs';
 import { StorageService } from '../services/storage.service';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
-  constructor(private _authService: AuthService, private _storageService: StorageService) {}
+  constructor(private _authService: AuthService, private _storageService: StorageService,  private readonly _router: Router,) {}
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const user = this._storageService.getUser();
+    if (user !== null) {
       request = request.clone({
         withCredentials: true,
+        setHeaders: {
+          Authorization: `Bearer ${user.accessToken}`,
+          RefreshToken: user.refreshToken
+        },
       });
-
+    } else {
+      request = request.clone({
+        withCredentials: true
+      });
+    }
+      console.log(request.url, request.responseType)
     // Check if access token is expired
-    if (request.responseType == 'json' && !request.url.endsWith('/api/auth/refreshToken') && this._authService.isAccessTokenExpired()) {
-      const user = this._storageService.getUser();
+    //&& this._authService.isAccessTokenExpired()
+    //|| request.url.indexOf('/api/user/register') < 0|| request.url.indexOf('/api/auth/sing-in') < 0 )
+    if (request.responseType == 'json' &&   request.url.indexOf('/api/auth/refreshToken') < 0 ) {
       if (user === null) {
         return next.handle(request).pipe(
           catchError((error) => {
@@ -26,7 +39,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       }
       return this._authService.refreshToken(user.refreshToken).pipe(
         switchMap((response: any) => {
-          this._storageService.saveUser({...user, accessToken:  response.data.refreshToken});
+          this._storageService.saveUser({...user, accessToken:  response.data.accessToken, refreshToken: response.data.refreshToken});
           // Clone the original request and add the updated access token
           const newRequest = request.clone({
             withCredentials: true,
@@ -47,8 +60,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
         catchError((error) => {
           console.error(error)
           // Handle token refresh error
-          // For example, redirect to login page or show an error message
-          return throwError(error);
+          return throwError(()=>{
+          //  this._storageService.clean();
+          //  window.location.href = "/auth/sign-in";
+          });
         }),
       );
     }

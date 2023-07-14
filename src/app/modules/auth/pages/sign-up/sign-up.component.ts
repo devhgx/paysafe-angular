@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { tap, catchError } from 'rxjs/operators';
-import { StorageService } from 'src/app/core/services/storage.service';
 import { of } from 'rxjs';
 import { ModalModel } from 'src/app/core/models/modal.model';
 import { UsersService } from 'src/app/core/services/users.service';
@@ -32,7 +31,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
     private readonly _formBuilder: FormBuilder,
     private readonly _router: Router,
     private _userService: UsersService,
-    private _storageService: StorageService,
   ) {}
 
   ngOnInit(): void {

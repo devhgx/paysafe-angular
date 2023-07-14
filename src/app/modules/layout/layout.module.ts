@@ -32,6 +32,7 @@ import { LayoutComponent } from './layout.component';
     NavbarMobileComponent,
     NavbarMobileMenuComponent,
     NavbarMobileSubmenuComponent,
+
   ],
   imports: [CommonModule, LayoutRoutingModule, HttpClientModule, AngularSvgIconModule.forRoot(), SharedModule],
 })

@@ -12,7 +12,7 @@ const httpOptions = {
   providedIn: 'root',
 })
 export class UserStatementService {
-  readonly _apiUrl = environment.apiUrl + 'user-statements';
+  private readonly _apiUrl = environment.apiUrl + 'user-statements';
 
   constructor(private _http: HttpClient, private _storageService: StorageService, private _jwtService: JwtService) {}
 

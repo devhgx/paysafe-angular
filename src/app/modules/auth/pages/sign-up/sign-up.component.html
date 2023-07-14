@@ -236,11 +236,12 @@
           Bank Account Number
         </label>
       </div>
+      <div *ngIf="submitted && f['bankAccountNumber'].errors" class="is__invalid-error">
+        <div *ngIf="f['bankAccountNumber'].errors['required']">Required field</div>
+        <div *ngIf="f['bankAccountNumber'].errors['minlength']">Bank Account Number must least 6 characters</div>
+      </div>
     </div>
-    <div *ngIf="submitted && f['bankAccountNumber'].errors" class="is__invalid-error">
-      <div *ngIf="f['bankAccountNumber'].errors['required']">Required field</div>
-      <div *ngIf="f['bankAccountNumber'].errors['minlength']">Bank Account Number must least 6 characters</div>
-    </div>
+
   </div>
 
   <div class="flex items-center justify-between space-x-3">

@@ -42,11 +42,9 @@ export class AuthService {
 
     return jwt && jwt.exp && jwt.exp * 1000 < currentTimestamp;
   }
-  logout(data:any): Observable<any> {
+  logout(): Observable<any> {
     const url: string = this._apiUrl + '/logout';
-    const body = data;
-
     return this._http
-      .post(url, body, httpOptions)
+      .get(url,  httpOptions)
   }
 }

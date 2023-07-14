@@ -20,4 +20,9 @@ export class TransactionService {
     const url: string = this._apiUrl + `/list/${pageNumber}/${pageSize}`;
     return this._http.get(url, httpOptions);
   }
+
+  listAll(pageNumber: number, pageSize: number): Observable<any> {
+    const url: string = this._apiUrl + `/listAll/${pageNumber}/${pageSize}`;
+    return this._http.get(url, httpOptions);
+  }
 }

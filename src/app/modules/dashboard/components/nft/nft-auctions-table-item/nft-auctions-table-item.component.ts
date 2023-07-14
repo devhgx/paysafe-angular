@@ -6,9 +6,20 @@ import { Nft } from '../../../models/nft';
   templateUrl: './nft-auctions-table-item.component.html',
 })
 export class NftAuctionsTableItemComponent implements OnInit {
-  @Input() auction = <Nft>{};
-
+  @Input() auction: any;
+  transactionType: any = {
+    "T": "Transaction",
+    "W": "Withdraw",
+    "D": "Deposit",
+  }
+  transactionProcessStatus: any = {
+    1: "Wait Recipient Approve",
+    2: "Wait Admin Approve",
+    3: "Success",
+  }
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(this.auction)
+  }
 }
