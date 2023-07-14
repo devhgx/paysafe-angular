@@ -28,8 +28,6 @@ export class DepositComponent implements OnInit, OnDestroy {
   passwordMatchValidate:boolean = false;
   constructor(
     private readonly _formBuilder: FormBuilder,
-    // private readonly _router: Router,
-    // private _userService: UsersService,
     private _transferService: TransferService,
   ) {}
 
@@ -75,7 +73,7 @@ export class DepositComponent implements OnInit, OnDestroy {
           tap((response: any) => {
             if (response.status === 200) {
               this.form.reset();
-              console.log(response);
+              Object.values(this.form.controls).forEach((control) => control.setErrors(null));
               this.modalData = {
                 title: 'Success',
                 description: 'You deposit ready!!',

@@ -75,8 +75,7 @@ export class WithdrawComponent implements OnInit, OnDestroy {
           tap((response: any) => {
             if (response.status === 200) {
               this.form.reset();
-              this.form.value.resetForm();
-
+              Object.values(this.form.controls).forEach((control) => control.setErrors(null));
               console.log(response);
               this.modalData = {
                 title: 'Success',

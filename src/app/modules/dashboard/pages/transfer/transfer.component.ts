@@ -76,7 +76,7 @@ export class TransferComponent implements OnInit, OnDestroy {
           tap((response: any) => {
             if (response.status === 200) {
               this.form.reset();
-              console.log(response);
+              Object.values(this.form.controls).forEach((control) => control.setErrors(null));
               this.modalData = {
                 title: 'Success',
                 description: 'You transfer ready!!',
