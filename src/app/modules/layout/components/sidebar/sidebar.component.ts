@@ -46,13 +46,20 @@ export class SidebarComponent implements OnInit, OnDestroy {
   clickSignOut() {
     this._authSub = this._authService
       .logout()
-      .pipe(catchError((error: any) => {
-          console.log(error);
+      .pipe(
+        tap((response: any) => {
+          if (response.status === 200) {
+            this._storageService.clean();
+            this._router.navigate(['/auth/sign-in']);
+          }
+        }),
+        catchError((error: any) => {
+          console.log('eeeeeeeeeee', error);
+          this._storageService.clean();
+          this._router.navigate(['/auth/sign-in']);
           return of(error).pipe(tap(console.error));
         }),
       )
       .subscribe();
-      this._storageService.clean();
-      this._router.navigate(['/auth/sign-in']);
   }
 }

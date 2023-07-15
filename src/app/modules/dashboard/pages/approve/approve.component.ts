@@ -21,7 +21,6 @@ export class ApproveComponent implements OnInit, OnDestroy {
   }
 
   approveRoot(transactionId: number) {
-
       this.approveSub =this._transferService.approve({transactionId: transactionId}).pipe(
         tap((response: any) => {
           if (response.status === 200) {
@@ -30,7 +29,11 @@ export class ApproveComponent implements OnInit, OnDestroy {
           }
         }),
         catchError((error: any) => {
-          this._toastService.toastError( error.error.data.join('</br>'))
+          try{
+            this._toastService.toastError(error.error.data.join('</br>'));
+          } catch(e) {
+            this._toastService.toastError("Something wrong check your connection.");
+          }
           return of(error).pipe(tap(console.error));
         }),
       )
@@ -52,7 +55,11 @@ export class ApproveComponent implements OnInit, OnDestroy {
         }
       }),
       catchError((error: any) => {
-        console.log(error);
+        try{
+          this._toastService.toastError(error.error.data.join('</br>'));
+        } catch(e) {
+          this._toastService.toastError("Something wrong check your connection.");
+        }
         return of(error).pipe(tap(console.error));
       }),
     )

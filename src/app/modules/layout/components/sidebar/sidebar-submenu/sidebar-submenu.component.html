@@ -13,8 +13,9 @@
         </ng-container>
 
         <!-- Parent Menu -->
-        <ng-template #parentMenu let-sub="sub">
+        <ng-template #parentMenu let-sub="sub" >
           <a
+          *ngIf="sub.roles?.includes(role)"
             [routerLink]="sub.route"
             routerLinkActive="text-primary-500"
             [routerLinkActiveOptions]="{ exact: true }"

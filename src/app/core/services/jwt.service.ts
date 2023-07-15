@@ -1,4 +1,4 @@
-import jwtDecode, { JwtPayload } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -9,7 +9,7 @@ export class JwtService {
 
   public decode(accessToken: string) {
     if (accessToken) {
-      return jwtDecode<JwtPayload>(accessToken);
+      return jwtDecode<any>(accessToken);
     }
     return null;
   }

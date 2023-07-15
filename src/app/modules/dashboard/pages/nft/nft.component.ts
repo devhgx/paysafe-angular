@@ -17,6 +17,7 @@ export class NftComponent implements OnInit, OnDestroy {
   _userStatementActiveSub: any = null;
   _userTransactionAllSub: any = null;
   listTransaction = []
+  public role:string = "" ;
   constructor(private _userService: UsersService, private _transactionService: TransactionService, private _storageService: StorageService, private _userStatementService:UserStatementService) {
     this.nft = [
       {
@@ -53,6 +54,7 @@ export class NftComponent implements OnInit, OnDestroy {
       .pipe(
         tap((response: any) => {
           if (response.status === 200) {
+            this.role = response.data.role;
             this._storageService.saveUserProfile(response.data);
           }
         }),
@@ -65,7 +67,6 @@ export class NftComponent implements OnInit, OnDestroy {
       this._userStatementActiveSub = this._userStatementService.listActive().pipe(
         tap((response: any) => {
           if (response.status === 200) {
-            console.log(response)
             this.nft[0].last_bid = response.data.balance;
             this.nft[1].last_bid = response.data.income;
             this.nft[2].last_bid = response.data.expense;
@@ -81,12 +82,10 @@ export class NftComponent implements OnInit, OnDestroy {
       this._userTransactionAllSub =  this._transactionService.listAll(0,10 ).pipe(
         tap((response: any) => {
           if (response.status === 200) {
-            console.log(response.data.content)
             this.listTransaction = response.data.content;
           }
         }),
         catchError((error: any) => {
-          console.log(error);
           return of(error).pipe(tap(console.error));
         }),
       )

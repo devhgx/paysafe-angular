@@ -27,19 +27,24 @@ export class SignUpComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.form = this._formBuilder.group({
-      fname: ['', [Validators.required, Validators.minLength(6)]],
-      lname: ['', [Validators.required, Validators.minLength(6)]],
-      username: ['', [Validators.required, Validators.minLength(6)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
-      phone: ['', [Validators.required, Validators.minLength(10)]],
-      bankId: ['', [Validators.required]],
-      bankAccountName: ['', [Validators.required], Validators.minLength(3)],
-      bankAccountNumber: ['', [Validators.required, Validators.minLength(6)]],
-      acceptTerm: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.minLength(6), Validators.email]],
-    });
+    this.form = this._formBuilder.group(
+      {
+        fname: ['', [Validators.required, Validators.minLength(6)]],
+        lname: ['', [Validators.required, Validators.minLength(6)]],
+        username: ['', [Validators.required, Validators.minLength(6)]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
+        phone: ['', [Validators.required, Validators.minLength(10)]],
+        bankId: ['', [Validators.required]],
+        bankAccountName: ['', [Validators.required, Validators.minLength(3)]],
+        bankAccountNumber: ['', [Validators.required, Validators.minLength(6)]],
+        acceptTerm: ['', [Validators.required]],
+        email: ['', [Validators.required, Validators.minLength(6), Validators.email]],
+      },
+      {
+        validator: ConfirmedValidator('password', 'confirmPassword'),
+      },
+    );
   }
 
   get f() {
@@ -56,28 +61,11 @@ export class SignUpComponent implements OnInit, OnDestroy {
   onSubmit() {
     this._toastService.toastClose();
     this.submitted = true;
-    const {
-      fname,
-      lname,
-      username,
-      confirmPassword,
-      email,
-      password,
-      phone,
-      bankId,
-      bankAccountName,
-      bankAccountNumber,
-      acceptTerm,
-    } = this.form.value;
+    const { fname, lname, username, email, password, phone, bankId, bankAccountName, bankAccountNumber, acceptTerm } =
+      this.form.value;
     // stop here if form is invalid
-    this.passwordMatchValidate = false;
-    if (password !== confirmPassword) {
-      this.passwordMatchValidate = true;
-      return;
-    }
-    if (this.form.invalid) {
-      return;
-    } else {
+    this.form.markAsDirty();
+    if (this.form.valid) {
       this._subscription = this._userService
         .register({
           firstName: fname,
@@ -95,21 +83,40 @@ export class SignUpComponent implements OnInit, OnDestroy {
           tap((response: any) => {
             if (response.status === 200) {
               this.form.reset();
-              Object.values(this.form.controls).forEach((control) => control.setErrors(null));
-              //this._router.navigate(['/auth/sign-in']);
+              this.submitted = false;
+              this._toastService.toastSuccess('Register Success');
             }
           }),
           catchError((error: any) => {
-            this._toastService.toastError(error.error.data.join('</br>'));
+            try{
+              this._toastService.toastError(error.error.data.join('</br>'));
+            } catch(e) {
+              this._toastService.toastError("Something wrong check your connection.");
+            }
             return of(error).pipe(tap(console.error));
           }),
         )
         .subscribe();
     }
+    return;
   }
   ngOnDestroy() {
     if (this._subscription) {
       this._subscription.unsubscribe();
     }
   }
+}
+function ConfirmedValidator(controlName: string, matchingControlName: string) {
+  return (formGroup: FormGroup) => {
+    const control = formGroup.controls[controlName];
+    const matchingControl = formGroup.controls[matchingControlName];
+    if (matchingControl.errors) {
+      return; //&& !matchingControl.errors.confirmedValidator
+    }
+    if (control.value !== matchingControl.value) {
+      matchingControl.setErrors({ confirmedValidator: true });
+    } else {
+      matchingControl.setErrors(null);
+    }
+  };
 }

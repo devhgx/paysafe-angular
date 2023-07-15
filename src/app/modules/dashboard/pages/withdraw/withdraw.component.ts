@@ -42,7 +42,6 @@ export class WithdrawComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.userProfile = this._storageService.getUserProfile();
-    console.log( this.userProfile )
     this.form = this._formBuilder.group({
       amount: ['', [Validators.required, Validators.min(1)]],
       userBankId: ['', [Validators.required]],
@@ -77,12 +76,16 @@ export class WithdrawComponent implements OnInit, OnDestroy {
           tap((response: any) => {
             if (response.status === 200) {
               this.form.reset();
-              Object.values(this.form.controls).forEach((control) => control.setErrors(null));
+              this.submitted = false;
               this._toastService.toastSuccess("Withdraw Success")
             }
           }),
           catchError((error: any) => {
-            this._toastService.toastError(error.error.data.join('</br>'));
+            try{
+              this._toastService.toastError(error.error.data.join('</br>'));
+            } catch(e) {
+              this._toastService.toastError("Something wrong check your connection.");
+            }
             return of(error).pipe(tap(console.error));
           }),
         )

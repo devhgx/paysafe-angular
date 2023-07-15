@@ -71,13 +71,19 @@ export class SignInComponent  implements OnInit, OnDestroy {
         .pipe(
           tap((response: any) => {
             if (response.status === 200) {
+              this.form.reset();
+              this.submitted = false;
               this._toastService.toastSuccess("Login success")
               this._storageService.saveUser(response.data);
               this._router.navigate(['/dashboard/main']);
             }
           }),
           catchError((error: any) => {
-            this._toastService.toastError(error.error.data.join('</br>'));
+            try{
+              this._toastService.toastError(error.error.data.join('</br>'));
+            } catch(e) {
+              this._toastService.toastError("Something wrong check your connection.");
+            }
             return of(error).pipe(tap(console.error));
           }),
         )

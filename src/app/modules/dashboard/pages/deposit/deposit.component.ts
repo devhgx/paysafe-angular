@@ -62,10 +62,8 @@ export class DepositComponent implements OnInit, OnDestroy {
       bankAccountNumber,
       note
     } = this.form.value;
-
-    if (this.form.invalid) {
-      return;
-    } else{
+  console.log(this.form.invalid, this.form.value, this.form.controls)
+    if (!this.form.invalid) {
       this._subscription = this._transferService
         .deposit(
           {
@@ -79,17 +77,22 @@ export class DepositComponent implements OnInit, OnDestroy {
           tap((response: any) => {
             if (response.status === 200) {
               this.form.reset();
-              Object.values(this.form.controls).forEach((control) => control.setErrors(null));
+              this.submitted = false;
               this._toastService.toastSuccess("Deposit Success")
             }
           }),
           catchError((error: any) => {
-            this._toastService.toastError(error.error.data.join('</br>'));
+            try{
+              this._toastService.toastError(error.error.data.join('</br>'));
+            } catch(e) {
+              this._toastService.toastError("Something wrong check your connection.");
+            }
             return of(error).pipe(tap(console.error));
           }),
         )
         .subscribe();
     }
+    return;
   }
   ngOnDestroy() {
     if (this._subscription) {

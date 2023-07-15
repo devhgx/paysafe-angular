@@ -23,11 +23,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
         withCredentials: true
       });
     }
-      console.log(request.url, request.responseType)
     // Check if access token is expired
     //&& this._authService.isAccessTokenExpired()
     //|| request.url.indexOf('/api/user/register') < 0|| request.url.indexOf('/api/auth/sing-in') < 0 )
-    if (request.responseType == 'json' &&   request.url.indexOf('/api/auth/refreshToken') < 0 ) {
+    if (request.responseType == 'json' && !request.url.includes('/api/auth/refreshToken')) {
       if (user === null) {
         return next.handle(request).pipe(
           catchError((error) => {

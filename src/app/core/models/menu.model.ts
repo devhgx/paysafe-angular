@@ -7,6 +7,7 @@ export interface MenuItem {
 }
 
 export interface SubMenuItem {
+  roles?: Array<string>;
   icon?: string;
   label?: string;
   route?: string | null;

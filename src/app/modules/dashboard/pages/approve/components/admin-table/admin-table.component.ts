@@ -24,7 +24,7 @@ export class AdminTableComponent implements OnInit {
   // constructor() {}
 
   ngOnInit(): void {
-    console.log(this.listTransaction);
+
   }
 
   approve(transactionId: number) {

@@ -12,10 +12,11 @@ export class ProfileMenuComponent implements OnInit {
   constructor(private _storageSerive: StorageService) {}
 
   ngOnInit(): void {
-      this.userProfile = this._storageSerive.getUserProfile()
+
   }
 
   public toggleMenu(): void {
+    this.userProfile = this._storageSerive.getUserProfile()
     this.isMenuOpen = !this.isMenuOpen;
   }
 }

@@ -151,8 +151,8 @@
           </svg-icon>
         </span>
       </div>
-      <div  *ngIf="submitted && passwordMatchValidate" class="is__invalid-error">Password miss match</div>
       <div *ngIf="submitted && f['confirmPassword'].errors" class="is__invalid-error">
+        <div  *ngIf="submitted && f['confirmPassword'].errors['confirmedValidator']" class="is__invalid-error">Password miss match</div>
         <div *ngIf="f['confirmPassword'].errors['required']">Required field</div>
         <div *ngIf="f['confirmPassword'].errors['minlength']">Confirm Password must least 6 characters</div>
       </div>
